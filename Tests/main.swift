@@ -2,10 +2,10 @@
 // Copyright (c) Vatsal Manot
 //
 
-@testable import ExamplePackage
+@testable import DiagnosticsTests
 
 import XCTest
 
-final class ExampleTests: XCTestCase {
+final class DiagnosticsTests: XCTestCase {
     
 }
