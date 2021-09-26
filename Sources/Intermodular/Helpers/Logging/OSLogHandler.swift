@@ -7,7 +7,7 @@ import os
 import Swift
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-public class SystemLogHandler: Logging.LogHandler {
+public class OSLogHandler: Logging.LogHandler {
     public var metadata: [String: Logging.Logger.Metadata.Value] = [:]
     public var logLevel: Logging.Logger.Level = .debug
     
