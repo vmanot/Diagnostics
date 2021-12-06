@@ -53,18 +53,22 @@ extension Logging.Logger.Message: LoggerMessageProtocol {
     
 }
 
-#if canImport(OSLog)
+#if canImport(os)
 
 import os
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-extension os.Logger {
+extension os.Logger: LoggerProtocol {
     public typealias Message = OSLogMessage
     
+    public func debug(_ message: String, metadata: [String : Any]?) {
+        self.error("\(message, privacy: .auto)")
+    }
+
     public func notice(_ message: String, metadata _: [String: Any]?) {
         self.info("\(message, privacy: .auto)")
     }
-
+    
     public func error(_ error: Error, metadata: [String: Any]?) {
         self.error("\(String(describing: error), privacy: .auto)")
     }
