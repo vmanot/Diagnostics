@@ -3,5 +3,6 @@
 //
 
 @_exported import Logging
-
-import Swift
+#if canImport(os)
+@_exported import os
+#endif
