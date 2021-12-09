@@ -24,10 +24,10 @@ public struct ConsoleLogHandler: LogHandler {
     public let label: String
     
     /// See `LogHandler.metadata`.
-    public var metadata: Logger.Metadata
+    public var metadata: Logging.Logger.Metadata
     
     /// See `LogHandler.logLevel`.
-    public var logLevel: Logger.Level
+    public var logLevel: Logging.Logger.Level
     
     /// The conosle that the messages will get logged to.
     public let console: Console
@@ -39,7 +39,7 @@ public struct ConsoleLogHandler: LogHandler {
     ///   - console: The console to log the messages to.
     ///   - level: The minimum level of message that the logger will output. This defaults to `.debug`, the lowest level.
     ///   - metadata: Extra metadata to log with the message. This defaults to an empty dictionary.
-    public init(label: String, console: Console = Log(), level: Logger.Level = .debug, metadata: Logger.Metadata = [:]) {
+    public init(label: String, console: Console = Log(), level: Logging.Logger.Level = .debug, metadata: Logging.Logger.Metadata = [:]) {
         self.label = label
         self.metadata = metadata
         self.logLevel = level
@@ -49,15 +49,15 @@ public struct ConsoleLogHandler: LogHandler {
     /// See `LogHandler[metadataKey:]`.
     ///
     /// This just acts as a getter/setter for the `.metadata` property.
-    public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
+    public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
         get { return self.metadata[key] }
         set { self.metadata[key] = newValue }
     }
     
     public func log(
-        level: Logger.Level,
-        message: Logger.Message,
-        metadata: Logger.Metadata?,
+        level: Logging.Logger.Level,
+        message: Logging.Logger.Message,
+        metadata: Logging.Logger.Metadata?,
         source: String,
         file: String,
         function: String,
@@ -105,7 +105,7 @@ public struct ConsoleLogHandler: LogHandler {
     }
 }
 
-private extension Logger.Metadata {
+private extension Logging.Logger.Metadata {
     var sortedDescriptionWithoutQuotes: String {
         let contents = Array(self)
             .sorted(by: { $0.0 < $1.0 })

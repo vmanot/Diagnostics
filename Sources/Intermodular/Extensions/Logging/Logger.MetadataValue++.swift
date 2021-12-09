@@ -5,7 +5,7 @@
 import Logging
 import Swift
 
-extension Logger.MetadataValue {
+extension Logging.Logger.MetadataValue {
     public init<T>(from value: T) {
         if let value = value as? CustomStringConvertible {
             self = .stringConvertible(value)

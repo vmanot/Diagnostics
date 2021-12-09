@@ -6,5 +6,5 @@ import Logging
 import Swift
 
 public protocol LoggerMetadataConvertible {
-    var loggerMetadata: Logger.Metadata { get }
+    var loggerMetadata: Logging.Logger.Metadata { get }
 }

@@ -5,7 +5,7 @@
 import Logging
 import Swift
 
-extension Logger.Message {
+extension Logging.Logger.Message {
     public init(_ string: String) {
         self.init(stringLiteral: string)
     }

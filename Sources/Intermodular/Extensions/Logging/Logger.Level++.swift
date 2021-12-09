@@ -5,7 +5,7 @@
 import Logging
 import Swift
 
-extension Logger.Level {
+extension Logging.Logger.Level {
     public var name: String {
         switch self {
             case .trace:

@@ -6,10 +6,10 @@ import Logging
 import Swift
 
 public class EmptyLogHandler: Logging.LogHandler {
-    public var metadata: [String: Logger.Metadata.Value] = [:]
-    public var logLevel: Logger.Level = .debug
+    public var metadata: [String: Logging.Logger.Metadata.Value] = [:]
+    public var logLevel: Logging.Logger.Level = .debug
     
-    public subscript(metadataKey key: String) -> Logger.Metadata.Value? {
+    public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
         get {
             metadata[key]
         } set {
@@ -18,9 +18,9 @@ public class EmptyLogHandler: Logging.LogHandler {
     }
     
     public func log(
-        level: Logger.Level,
-        message: Logger.Message,
-        metadata: Logger.Metadata?,
+        level: Logging.Logger.Level,
+        message: Logging.Logger.Message,
+        metadata: Logging.Logger.Metadata?,
         source: String,
         file: String,
         function: String,
@@ -30,9 +30,9 @@ public class EmptyLogHandler: Logging.LogHandler {
     }
     
     public func log(
-        level: Logger.Level,
-        message: Logger.Message,
-        metadata: Logger.Metadata?,
+        level: Logging.Logger.Level,
+        message: Logging.Logger.Message,
+        metadata: Logging.Logger.Metadata?,
         file: String,
         function: String,
         line: UInt

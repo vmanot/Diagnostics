@@ -5,10 +5,10 @@
 import Logging
 import Swallow
 
-extension Logger {
+extension Logging.Logger {
     public func log(
         _ error: Error,
-        metadata: @autoclosure () -> Logger.Metadata? = nil,
+        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
         file: String = #file,
         function: String = #function,
         line: UInt = #line
