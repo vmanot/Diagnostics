@@ -6,8 +6,6 @@ import Logging
 import Swift
 
 public protocol LoggerProtocol {
-    associatedtype Message: LoggerMessageProtocol
-    
     func debug(_ message: String, metadata: [String: Any]?)
     func notice(_ message: String, metadata: [String: Any]?)
     func error(_ error: Error, metadata: [String: Any]?)
