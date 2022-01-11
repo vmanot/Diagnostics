@@ -7,8 +7,8 @@ import Swift
 import os
 
 /// A logger that emits runtime issues.
-public struct RuntimeIssuesLogger {
-    public static let `default` = RuntimeIssuesLogger()
+public struct XcodeRuntimeIssueLogger {
+    public static let `default` = XcodeRuntimeIssueLogger()
 
     @_transparent
     @inline(__always)

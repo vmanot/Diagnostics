@@ -70,8 +70,8 @@ public struct ConsoleLogHandler: LogHandler {
         }
         
         text += "[\(level.name)]"
-            + " "
-            + message.description
+        + " "
+        + message.description
         
         let allMetadata = (metadata ?? [:]).merging(self.metadata) { (a, _) in a }
         
