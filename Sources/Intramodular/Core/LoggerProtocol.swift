@@ -69,35 +69,6 @@ extension Logging.Logger: LoggerProtocol {
     }
 }
 
-// TODO: Improve implementation
-extension TextDump: LoggerProtocol {
-    public typealias LogLevel = AnyLogLevel
-    public typealias LogMessage = Logging.Logger.Message
-    
-    public func log(
-        level: LogLevel,
-        _ message: @autoclosure () -> LogMessage,
-        metadata: @autoclosure () -> [String : Any]?,
-        file: String,
-        function: String,
-        line: UInt
-    ) {
-        
-    }
-    
-    public func debug(_ message: String, metadata: [String: Any]?) {
-        lines.append("[DEBUG] \(message)")
-    }
-    
-    public func notice(_ message: String, metadata: [String: Any]?) {
-        lines.append("[NOTICE] \(message)")
-    }
-    
-    public func error(_ error: Error, metadata: [String: Any]?) {
-        lines.append("[ERROR] \(error)")
-    }
-}
-
 #if canImport(os)
 
 import os
@@ -119,7 +90,7 @@ extension os.Logger: LoggerProtocol {
     }
     
     public func debug(_ message: String, metadata: [String : Any]?) {
-        self.error("\(message, privacy: .auto)")
+        self.debug("\(message, privacy: .auto)")
     }
     
     public func notice(_ message: String, metadata _: [String: Any]?) {

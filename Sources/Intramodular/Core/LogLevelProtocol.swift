@@ -18,6 +18,25 @@ public protocol LogLevelProtocol: StringConvertible {
     
 }
 
+public protocol ClientLogLevelProtocol: LogLevelProtocol {
+    static var undefined: Self { get }
+    static var debug: Self { get }
+    static var info: Self { get }
+    static var notice: Self { get }
+    static var error: Self { get }
+    static var fault: Self { get }
+}
+
+public protocol ServerLogLevelProtocol: LogLevelProtocol {
+    static var trace: Self { get }
+    static var debug: Self { get }
+    static var info: Self { get }
+    static var notice: Self { get }
+    static var warning: Self { get }
+    static var error: Self { get }
+    static var critical: Self { get }
+}
+
 // MARK: - Implementations -
 
 public enum AnyLogLevel: String, LogLevelProtocol {
@@ -37,7 +56,7 @@ public enum AnyLogLevel: String, LogLevelProtocol {
 }
 
 /// A log-level type suitable for client applications.
-public enum ClientLogLevel: String, LogLevelProtocol {
+public enum ClientLogLevel: String, ClientLogLevelProtocol {
     case undefined
     case debug
     case info
@@ -51,7 +70,7 @@ public enum ClientLogLevel: String, LogLevelProtocol {
 }
 
 /// A log-level type suitable for server applications.
-public enum ServerLogLevel: String, LogLevelProtocol {
+public enum ServerLogLevel: String, ServerLogLevelProtocol {
     case trace
     case debug
     case info
