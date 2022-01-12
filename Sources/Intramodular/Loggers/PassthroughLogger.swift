@@ -8,15 +8,15 @@ import Swallow
 
 /// A logger that broadcasts its entries.
 public final class PassthroughLogger: Initiable, LoggerProtocol, ObservableObject {
-    public typealias LogLevel = ClientLogLevel
-    public typealias LogMessage = Logging.Logger.Message
-    
-    public struct Entry: Hashable {
+    public struct LogEntry: Hashable {
         public let sourceCodeLocation: SourceCodeLocation?
         public let message: String
     }
     
-    public internal(set) var entries: [Entry] = []
+    public typealias LogLevel = ClientLogLevel
+    public typealias LogMessage = Logging.Logger.Message
+    
+    public internal(set) var entries: [LogEntry] = []
     
     public init() {
         
