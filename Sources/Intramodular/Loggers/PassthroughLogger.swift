@@ -6,6 +6,7 @@ import Combine
 import Logging
 import Swallow
 
+/// A logger that broadcasts its entries.
 public final class PassthroughLogger: Initiable, LoggerProtocol, ObservableObject {
     public typealias LogLevel = ClientLogLevel
     public typealias LogMessage = Logging.Logger.Message
