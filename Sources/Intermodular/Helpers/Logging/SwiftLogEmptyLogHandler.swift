@@ -5,7 +5,7 @@
 import Logging
 import Swift
 
-public class EmptyLogHandler: Logging.LogHandler {
+public class SwiftLogEmptyLogHandler: Logging.LogHandler {
     public var metadata: [String: Logging.Logger.Metadata.Value] = [:]
     public var logLevel: Logging.Logger.Level = .debug
     

@@ -18,24 +18,28 @@ public protocol LoggerProtocol {
         line: UInt
     )
     
+    func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> String,
+        metadata: @autoclosure () -> [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    )
+    
     func debug(_ message: String, metadata: [String: Any]?)
-    func notice(_ message: String, metadata: [String: Any]?)
     func error(_ error: Error, metadata: [String: Any]?)
 }
 
 // MARK: - Extensions -
 
 extension LoggerProtocol {
-    public func notice(_ message: String, metadata: [String: Any]? = nil) {
-        self.notice(message, metadata: nil)
-    }
-    
     public func debug(_ message: String, metadata: [String: Any]? = nil) {
-        self.debug(message, metadata: nil)
+        self.debug(message, metadata: metadata)
     }
     
     public func error(_ error: Error, metadata: [String: Any]? = nil) {
-        self.error(error, metadata: nil)
+        self.error(error, metadata: metadata)
     }
 }
 
@@ -53,13 +57,35 @@ extension Logging.Logger: LoggerProtocol {
         function: String,
         line: UInt
     ) {
-        
+        log(
+            level: level,
+            message(),
+            metadata: metadata()?.mapValues({ Logger.MetadataValue(from: $0) }),
+            source: nil,
+            file: file,
+            function: function,
+            line: line
+        )
     }
     
-    public func notice(_ message: String, metadata: [String: Any]?) {
-        self.log(level: .notice, .init(message), metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) }))
+    public func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> String,
+        metadata: @autoclosure () -> [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        log(
+            level: level,
+            LogMessage("\(message())"),
+            metadata: metadata()?.mapValues({ Logger.MetadataValue(from: $0) }),
+            file: file,
+            function: function,
+            line: line
+        )
     }
-    
+
     public func debug(_ message: String, metadata: [String: Any]?) {
         self.log(level: .debug, .init(message), metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) }))
     }
@@ -74,7 +100,12 @@ extension Logging.Logger: LoggerProtocol {
 import os
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-extension os.Logger: LoggerProtocol {
+protocol OSLoggerProtocol {
+    func log(level: OSLogType, _ message: OSLogMessage)
+}
+
+@available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
+extension os.Logger: LoggerProtocol, OSLoggerProtocol {
     public typealias LogLevel = OSLogType
     public typealias LogMessage = OSLogMessage
     
@@ -86,19 +117,28 @@ extension os.Logger: LoggerProtocol {
         function: String,
         line: UInt
     ) {
+        (self as OSLoggerProtocol).log(level: level, message())
+    }
+    
+    public func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> String,
+        metadata: @autoclosure () -> [String : Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        let message = message()
         
+        log(level: level, "\(message, privacy: .auto)")
     }
     
     public func debug(_ message: String, metadata: [String : Any]?) {
-        self.debug("\(message, privacy: .auto)")
-    }
-    
-    public func notice(_ message: String, metadata _: [String: Any]?) {
-        self.info("\(message, privacy: .auto)")
+        self.log(level: .debug, "\(message, privacy: .auto)")
     }
     
     public func error(_ error: Error, metadata: [String: Any]?) {
-        self.error("\(String(describing: error), privacy: .auto)")
+        self.log(level: .error, "\(String(describing: error), privacy: .auto)")
     }
 }
 

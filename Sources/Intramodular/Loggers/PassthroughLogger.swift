@@ -6,9 +6,8 @@ import Combine
 import Logging
 import Swallow
 
-// TODO: Improve implementation
-public final class TextDump: Initiable, LoggerProtocol, ObservableObject {
-    public typealias LogLevel = AnyLogLevel
+public final class PassthroughLogger: Initiable, LoggerProtocol, ObservableObject {
+    public typealias LogLevel = ClientLogLevel
     public typealias LogMessage = Logging.Logger.Message
     
     public struct Entry: Hashable {
@@ -39,9 +38,27 @@ public final class TextDump: Initiable, LoggerProtocol, ObservableObject {
             )
         )
     }
+    
+    public func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> String,
+        metadata: @autoclosure () -> [String : Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        entries.append(
+            .init(
+                sourceCodeLocation: SourceCodeLocation(
+                    file: file, function: function, line: line, column: nil
+                ),
+                message: message()
+            )
+        )
+    }
 }
 
-extension TextDump: TextOutputStream {
+extension PassthroughLogger: TextOutputStream {
     public func write(_ string: String) {
         entries.append(.init(sourceCodeLocation: nil, message: string))
         

@@ -4,54 +4,33 @@
 
 import Foundation
 import Logging
+import Swift
 
-public struct Log: Console {
-    public init() {
-        
-    }
-    
-    public func output(_ text: @autoclosure () -> String) {
-        print(text())
-    }
-}
-
-public protocol Console {
-    func output(_ text: @autoclosure () -> String)
-}
-
-/// Outputs logs to a `Console`.
-public struct ConsoleLogHandler: LogHandler {
+/// A SwiftLog log handler suitable for outputting to a console.
+public struct SwiftLogConsoleLogHandler: LogHandler {
     public let label: String
-    
-    /// See `LogHandler.metadata`.
     public var metadata: Logging.Logger.Metadata
-    
-    /// See `LogHandler.logLevel`.
     public var logLevel: Logging.Logger.Level
+    public let console: ConsoleOutputStream
     
-    /// The conosle that the messages will get logged to.
-    public let console: Console
-    
-    /// Creates a new `ConsoleLogHandler` instance.
-    ///
-    /// - Parameters:
-    ///   - label: Unique identifier for this logger.
-    ///   - console: The console to log the messages to.
-    ///   - level: The minimum level of message that the logger will output. This defaults to `.debug`, the lowest level.
-    ///   - metadata: Extra metadata to log with the message. This defaults to an empty dictionary.
-    public init(label: String, console: Console = Log(), level: Logging.Logger.Level = .debug, metadata: Logging.Logger.Metadata = [:]) {
+    public init(
+        label: String,
+        console: ConsoleOutputStream = .default,
+        level: Logging.Logger.Level = .debug,
+        metadata: Logging.Logger.Metadata = [:]
+    ) {
         self.label = label
         self.metadata = metadata
         self.logLevel = level
         self.console = console
     }
     
-    /// See `LogHandler[metadataKey:]`.
-    ///
-    /// This just acts as a getter/setter for the `.metadata` property.
     public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
-        get { return self.metadata[key] }
-        set { self.metadata[key] = newValue }
+        get {
+            return metadata[key]
+        } set {
+            metadata[key] = newValue
+        }
     }
     
     public func log(
@@ -87,7 +66,7 @@ public struct ConsoleLogHandler: LogHandler {
             text += " (" + fileInfo + ")"
         }
         
-        self.console.output(text)
+        self.console.write(text)
     }
     
     /// splits a path on the /Sources/ folder, returning everything after
@@ -105,8 +84,10 @@ public struct ConsoleLogHandler: LogHandler {
     }
 }
 
-private extension Logging.Logger.Metadata {
-    var sortedDescriptionWithoutQuotes: String {
+// MARK: - Auxiliary Implementation -
+
+extension Logging.Logger.Metadata {
+    fileprivate var sortedDescriptionWithoutQuotes: String {
         let contents = Array(self)
             .sorted(by: { $0.0 < $1.0 })
             .map { "\($0.description): \($1)" }
