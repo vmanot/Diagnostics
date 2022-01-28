@@ -7,7 +7,7 @@ import Logging
 import Swallow
 
 /// A logger that broadcasts its entries.
-public final class PassthroughLogger: Initiable, LoggerProtocol, ObservableObject {
+public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProtocol, ObservableObject {
     public struct LogEntry: Hashable {
         public let sourceCodeLocation: SourceCodeLocation?
         public let message: String
