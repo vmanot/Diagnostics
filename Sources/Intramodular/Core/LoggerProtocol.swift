@@ -5,7 +5,7 @@
 import Swift
 
 /// A type that can log messages.
-public protocol LoggerProtocol {
+public protocol LoggerProtocol: Sendable {
     associatedtype LogLevel: LogLevelProtocol
     associatedtype LogMessage: LogMessageProtocol
     
@@ -45,7 +45,7 @@ extension LoggerProtocol {
 
 // MARK: - Implementations -
 
-extension Logging.Logger: LoggerProtocol {
+extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
     public typealias LogLevel = Logging.Logger.Level
     public typealias LogMessage = Logging.Logger.Message
     
@@ -105,7 +105,7 @@ protocol OSLoggerProtocol {
 }
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-extension os.Logger: LoggerProtocol, OSLoggerProtocol {
+extension os.Logger: LoggerProtocol, OSLoggerProtocol, @unchecked Sendable {
     public typealias LogLevel = OSLogType
     public typealias LogMessage = OSLogMessage
     
