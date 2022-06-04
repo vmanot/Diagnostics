@@ -16,6 +16,8 @@ public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProt
     public typealias LogLevel = ClientLogLevel
     public typealias LogMessage = Logging.Logger.Message
     
+    private let lock = OSUnfairLock()
+    
     public internal(set) var entries: [LogEntry] = []
     
     public init() {
@@ -30,14 +32,19 @@ public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProt
         function: String,
         line: UInt
     ) {
-        entries.append(
-            .init(
-                sourceCodeLocation: SourceCodeLocation(
-                    file: file, function: function, line: line, column: nil
-                ),
-                message: message().description
+        lock.withCriticalScope {
+            entries.append(
+                .init(
+                    sourceCodeLocation: SourceCodeLocation(
+                        file: file,
+                        function: function,
+                        line: line,
+                        column: nil
+                    ),
+                    message: message().description
+                )
             )
-        )
+        }
     }
     
     public func log(
@@ -48,22 +55,29 @@ public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProt
         function: String,
         line: UInt
     ) {
-        entries.append(
-            .init(
-                sourceCodeLocation: SourceCodeLocation(
-                    file: file, function: function, line: line, column: nil
-                ),
-                message: message()
+        lock.withCriticalScope {
+            entries.append(
+                .init(
+                    sourceCodeLocation: SourceCodeLocation(
+                        file: file,
+                        function: function,
+                        line: line,
+                        column: nil
+                    ),
+                    message: message()
+                )
             )
-        )
+        }
     }
 }
+
+// MARK: - Protocol Conformances -
 
 extension PassthroughLogger: TextOutputStream {
     public func write(_ string: String) {
         entries.append(.init(sourceCodeLocation: nil, message: string))
         
-        Task.detached(priority: .userInitiated) {
+        Task {
             await MainActor.run {
                 self.objectWillChange.send()
             }

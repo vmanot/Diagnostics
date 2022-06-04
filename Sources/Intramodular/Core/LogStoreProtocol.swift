@@ -13,7 +13,7 @@ public protocol LogStoreProtocol {
     associatedtype LogEntries: Sequence where LogEntries.Element == LogEntry
     associatedtype LogEnumeratorOptions
     associatedtype LogPosition
-
+    
     func getEntries(
         with options: LogEnumeratorOptions,
         at position: LogPosition?,

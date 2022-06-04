@@ -85,7 +85,7 @@ extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
             line: line
         )
     }
-
+    
     public func debug(_ message: String, metadata: [String: Any]?) {
         self.log(level: .debug, .init(message), metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) }))
     }
@@ -96,7 +96,6 @@ extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
 }
 
 #if canImport(os)
-
 import os
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
@@ -141,6 +140,4 @@ extension os.Logger: LoggerProtocol, OSLoggerProtocol, @unchecked Sendable {
         self.log(level: .error, "\(String(describing: error), privacy: .auto)")
     }
 }
-
 #endif
-
