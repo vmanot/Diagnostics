@@ -6,23 +6,26 @@ import Foundation
 import Logging
 import Swift
 
-/// A SwiftLog log handler suitable for outputting to a console.
-public struct SwiftLogConsoleLogHandler: LogHandler {
+/// A SwiftLog logging backend suitable for streaming output to a given text output stream.
+public final class SwiftLogConsoleLogHandler: LogHandler {
+    private let lock = OSUnfairLock()
+    
     public let label: String
     public var metadata: Logging.Logger.Metadata
     public var logLevel: Logging.Logger.Level
-    public let console: ConsoleOutputStream
+    
+    public private(set) var output: TextOutputStream
     
     public init(
         label: String,
-        console: ConsoleOutputStream = .default,
+        output: TextOutputStream = ConsoleOutputStream(),
         level: Logging.Logger.Level = .debug,
         metadata: Logging.Logger.Metadata = [:]
     ) {
         self.label = label
+        self.output = output
         self.metadata = metadata
         self.logLevel = level
-        self.console = console
     }
     
     public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
@@ -44,39 +47,33 @@ public struct SwiftLogConsoleLogHandler: LogHandler {
     ) {
         var text: String = ""
         
-        if self.logLevel <= .trace {
-            text += "[\(self.label)] "
+        if logLevel <= .trace {
+            text += "[\(label)] "
         }
         
-        text += "[\(level.name)]"
-        + " "
-        + message.description
+        text += "[\(level.name)] \(message.description)"
         
-        let allMetadata = (metadata ?? [:]).merging(self.metadata) { (a, _) in a }
+        let allMetadata = (metadata ?? [:]).merging(self.metadata, uniquingKeysWith: { (lhs, _) in lhs })
         
         if !allMetadata.isEmpty {
-            // only log metadata if not empty
             text += " " + allMetadata.sortedDescriptionWithoutQuotes
         }
         
-        // log file info if we are debug or lower
-        if self.logLevel <= .debug {
-            // log the concise path + line
-            let fileInfo = self.conciseSourcePath(file) + ":" + line.description
+        // Log file info if log level is `.debug` or lower.
+        if logLevel <= .debug {
+            let fileInfo = getConciseSourcePath(fromPath: file) + ":" + line.description
+            
             text += " (" + fileInfo + ")"
         }
         
-        self.console.write(text)
+        lock.withCriticalScope {
+            output.write(text)
+        }
     }
     
-    /// splits a path on the /Sources/ folder, returning everything after
-    ///
-    ///     "/Users/developer/dev/MyApp/Sources/Run/main.swift"
-    ///     // becomes
-    ///     "Run/main.swift"
-    ///
-    private func conciseSourcePath(_ path: String) -> String {
+    private func getConciseSourcePath(fromPath path: String) -> String {
         let separator: Substring = path.contains("Sources") ? "Sources" : "Tests"
+        
         return path.split(separator: "/")
             .split(separator: separator)
             .last?
