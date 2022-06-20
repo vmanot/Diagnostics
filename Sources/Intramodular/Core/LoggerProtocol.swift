@@ -27,19 +27,118 @@ public protocol LoggerProtocol: Sendable {
         line: UInt
     )
     
-    func debug(_ message: String, metadata: [String: Any]?)
-    func error(_ error: Error, metadata: [String: Any]?)
+    func debug(
+        _ message: String,
+        metadata: [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    )
+
+    func error(
+        _ error: Error,
+        metadata: [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    )
 }
 
 // MARK: - Extensions -
 
 extension LoggerProtocol {
-    public func debug(_ message: String, metadata: [String: Any]? = nil) {
-        self.debug(message, metadata: metadata)
+    @_disfavoredOverload
+    public func debug(
+        _ message: String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        self.debug(message, metadata: metadata, file: file, function: function, line: line)
     }
     
-    public func error(_ error: Error, metadata: [String: Any]? = nil) {
-        self.error(error, metadata: metadata)
+    @_disfavoredOverload
+    public func error(
+        _ error: Error,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        self.error(error, metadata: metadata, file: file, function: function, line: line)
+    }
+}
+
+extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
+    public func debug(
+        _ message: String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .debug,
+            message,
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+    
+    public func error(
+        _ error: Error,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .error,
+            String(describing: error),
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+}
+
+extension LoggerProtocol where LogLevel: ServerLogLevelProtocol {
+    public func debug(
+        _ message: String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .debug,
+            message,
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+    
+    public func error(
+        _ error: Error,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .error,
+            String(describing: error),
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
     }
 }
 
@@ -86,12 +185,30 @@ extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
         )
     }
     
-    public func debug(_ message: String, metadata: [String: Any]?) {
-        self.log(level: .debug, .init(message), metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) }))
+    public func debug(
+        _ message: String,
+        metadata: [String : Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        self.log(
+            level: .debug, .init(message),
+            metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) })
+        )
     }
     
-    public func error(_ error: Error, metadata: [String: Any]?) {
-        self.log(level: .error, .init(String(describing: error)), metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) }))
+    public func error(
+        _ error: Error,
+        metadata: [String : Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        self.log(
+            level: .error, .init(String(describing: error)),
+            metadata: metadata?.mapValues({ Logger.MetadataValue(from: $0) })
+        )
     }
 }
 
@@ -132,11 +249,23 @@ extension os.Logger: LoggerProtocol, OSLoggerProtocol, @unchecked Sendable {
         log(level: level, "\(message, privacy: .auto)")
     }
     
-    public func debug(_ message: String, metadata: [String : Any]?) {
+    public func debug(
+        _ message: String,
+        metadata: [String : Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
         self.log(level: .debug, "\(message, privacy: .auto)")
     }
     
-    public func error(_ error: Error, metadata: [String: Any]?) {
+    public func error(
+        _ error: Error,
+        metadata: [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
         self.log(level: .error, "\(String(describing: error), privacy: .auto)")
     }
 }

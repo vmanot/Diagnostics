@@ -34,7 +34,7 @@ public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProt
     ) {
         lock.withCriticalScope {
             entries.append(
-                .init(
+                LogEntry(
                     sourceCodeLocation: SourceCodeLocation(
                         file: file,
                         function: function,
@@ -57,7 +57,7 @@ public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProt
     ) {
         lock.withCriticalScope {
             entries.append(
-                .init(
+                LogEntry(
                     sourceCodeLocation: SourceCodeLocation(
                         file: file,
                         function: function,
