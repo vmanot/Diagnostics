@@ -34,7 +34,7 @@ public protocol LoggerProtocol: Sendable {
         function: String,
         line: UInt
     )
-
+    
     func error(
         _ error: Error,
         metadata: [String: Any]?,
@@ -212,8 +212,9 @@ extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
     }
 }
 
-#if canImport(os)
+#if canImport(OSLog)
 import os
+import OSLog
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
 protocol OSLoggerProtocol {

@@ -20,3 +20,16 @@ public protocol LogStoreProtocol {
         matching predicate: NSPredicate?
     ) throws -> LogEntries
 }
+
+// MARK: - Implementations -
+
+#if canImport(OSLog)
+import OSLog
+@available(macOS 10.15, iOS 15.0, watchOS 8.0, tvOS 15.0, *)
+extension OSLogStore: LogStoreProtocol {
+    public typealias LogEntry = OSLogEntry
+    public typealias LogEntries = AnySequence<OSLogEntry>
+    public typealias LogEnumeratorOptions = OSLogEnumerator.Options
+    public typealias LogPosition = OSLogPosition
+}
+#endif
