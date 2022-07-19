@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Logging
 import os
 import Swift
@@ -76,3 +78,5 @@ extension OSLogType {
         }
     }
 }
+
+#endif

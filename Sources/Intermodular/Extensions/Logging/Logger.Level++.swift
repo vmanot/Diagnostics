@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Logging
 import Swift
 
@@ -25,3 +27,5 @@ extension Logging.Logger.Level {
         }
     }
 }
+
+#endif

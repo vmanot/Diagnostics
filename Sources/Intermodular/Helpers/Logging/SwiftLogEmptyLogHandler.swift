@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Logging
 import Swift
 
@@ -40,3 +42,5 @@ public class SwiftLogEmptyLogHandler: Logging.LogHandler {
         
     }
 }
+
+#endif

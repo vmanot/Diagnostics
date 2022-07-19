@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Logging
 import Swallow
 
@@ -23,3 +25,5 @@ extension Logging.Logger {
         )
     }
 }
+
+#endif

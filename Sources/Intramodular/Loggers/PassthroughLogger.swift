@@ -3,18 +3,31 @@
 //
 
 import Combine
-import Logging
 import Swallow
 
 /// A logger that broadcasts its entries.
 public final class PassthroughLogger: @unchecked Sendable, Initiable, LoggerProtocol, ObservableObject {
+    public typealias LogLevel = ClientLogLevel
+    public typealias LogMessage = Message
+    
+    public struct Message: Equatable, CustomStringConvertible, LogMessageProtocol {
+        public typealias StringLiteralType = String
+        
+        private var value: String
+        
+        public init(stringLiteral value: String) {
+            self.value = value
+        }
+        
+        public var description: String {
+            return self.value
+        }
+    }
+    
     public struct LogEntry: Hashable {
         public let sourceCodeLocation: SourceCodeLocation?
         public let message: String
     }
-    
-    public typealias LogLevel = ClientLogLevel
-    public typealias LogMessage = Logging.Logger.Message
     
     private let lock = OSUnfairLock()
     

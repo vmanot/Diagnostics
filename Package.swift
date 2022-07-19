@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-let package = Package(
+var package = Package(
     name: "Diagnostics",
     platforms: [
         .iOS(.v13),
@@ -17,14 +17,12 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
         .package(url: "https://github.com/vmanot/Swallow.git", .branch("master"))
     ],
     targets: [
         .target(
             name: "Diagnostics",
             dependencies: [
-                .product(name: "Logging", package: "swift-log"),
                 "Swallow"
             ],
             path: "Sources"
@@ -36,3 +34,9 @@ let package = Package(
         )
     ]
 )
+
+// TODO: Improve conditionalization.
+#if os(Linux)
+package.dependencies.append(.package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"))
+package.targets = package.targets.map({ $0.dependencies.append(.product(name: "Logging", package: "swift-log")) })
+#endif

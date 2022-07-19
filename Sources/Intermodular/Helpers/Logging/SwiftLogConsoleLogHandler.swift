@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Foundation
 import Logging
 import Swift
@@ -93,3 +95,5 @@ extension Logging.Logger.Metadata {
         return "[\(contents)]"
     }
 }
+
+#endif

@@ -144,6 +144,9 @@ extension LoggerProtocol where LogLevel: ServerLogLevelProtocol {
 
 // MARK: - Implementations -
 
+#if canImport(Logging)
+import Logging
+
 extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
     public typealias LogLevel = Logging.Logger.Level
     public typealias LogMessage = Logging.Logger.Message
@@ -211,6 +214,7 @@ extension Logging.Logger: LoggerProtocol, @unchecked Sendable {
         )
     }
 }
+#endif
 
 #if canImport(OSLog)
 import os

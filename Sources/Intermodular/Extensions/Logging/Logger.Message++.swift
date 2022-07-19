@@ -2,6 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
+#if canImport(Logging)
+
 import Logging
 import Swift
 
@@ -10,3 +12,5 @@ extension Logging.Logger.Message {
         self.init(stringLiteral: string)
     }
 }
+
+#endif
