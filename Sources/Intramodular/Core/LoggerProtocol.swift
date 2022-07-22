@@ -88,6 +88,23 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
         )
     }
     
+    public func info(
+        _ message: String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .info,
+            message,
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+    
     public func error(
         _ error: Error,
         metadata: [String: Any]? = nil,
