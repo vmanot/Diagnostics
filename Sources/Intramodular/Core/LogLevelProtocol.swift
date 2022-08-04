@@ -14,19 +14,24 @@ import OSLog
 import Swallow
 import Swift
 
+/// A type that represents a log-level.
 public protocol LogLevelProtocol: StringConvertible {
     
 }
 
+/// A type that represents a log-level suitable for client-side logging.
 public protocol ClientLogLevelProtocol: LogLevelProtocol {
     static var undefined: Self { get }
     static var debug: Self { get }
     static var info: Self { get }
     static var notice: Self { get }
+    static var warning: Self { get }
     static var error: Self { get }
     static var fault: Self { get }
+    static var critical: Self { get }
 }
 
+/// A type that represents a log-level suitable for server-side logging.
 public protocol ServerLogLevelProtocol: LogLevelProtocol {
     static var trace: Self { get }
     static var debug: Self { get }
@@ -61,8 +66,10 @@ public enum ClientLogLevel: String, ClientLogLevelProtocol {
     case debug
     case info
     case notice
+    case warning
     case error
     case fault
+    case critical
     
     public var stringValue: String {
         rawValue

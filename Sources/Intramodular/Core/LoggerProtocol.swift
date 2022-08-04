@@ -72,7 +72,7 @@ extension LoggerProtocol {
 
 extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
     public func debug(
-        _ message: String,
+        _ message: @autoclosure () -> String,
         metadata: [String: Any]? = nil,
         file: String = #file,
         function: String = #function,
@@ -80,16 +80,16 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
     ) {
         log(
             level: .debug,
-            message,
+            message(),
             metadata: metadata,
             file: file,
             function: function,
             line: line
         )
     }
-    
+
     public func info(
-        _ message: String,
+        _ message: @autoclosure () -> String,
         metadata: [String: Any]? = nil,
         file: String = #file,
         function: String = #function,
@@ -97,14 +97,31 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
     ) {
         log(
             level: .info,
-            message,
+            message(),
             metadata: metadata,
             file: file,
             function: function,
             line: line
         )
     }
-    
+
+    public func warning(
+        _ message: @autoclosure () -> String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .warning,
+            message(),
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+
     public func error(
         _ error: Error,
         metadata: [String: Any]? = nil,
