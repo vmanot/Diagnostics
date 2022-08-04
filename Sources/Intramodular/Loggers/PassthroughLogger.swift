@@ -18,7 +18,7 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
         public var description: String {
             rawValue
         }
-
+        
         public init(rawValue: String) {
             self.rawValue = rawValue
         }
@@ -98,7 +98,7 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
                 )
             )
             
-            if PassthroughLoggerGlobalConfiguration.outputToConsole {
+            if Self.GlobalConfiguration.dumpToConsole {
                 print("[\(source.description)] \(message())")
             }
         }
@@ -139,25 +139,28 @@ extension PassthroughLogger: TextOutputStream {
 
 // MARK: - Auxiliary Implementation -
 
-enum PassthroughLoggerGlobalConfiguration {
-    @TaskLocal
-    static var outputToConsole: Bool = false
+extension PassthroughLogger {
+    enum GlobalConfiguration {
+        @TaskLocal
+        static var dumpToConsole: Bool = false
+    }
 }
 
-
 extension PassthroughLogger {
-    public static func outputToConsole(
+    /// Executes the given closure and dumps any `PassthroughLogger` logged messages to the console during its execution.
+    public static func dump(
         _ body: () throws -> Void
     ) rethrows {
-        try PassthroughLoggerGlobalConfiguration.$outputToConsole.withValue(true) {
+        try Self.GlobalConfiguration.$dumpToConsole.withValue(true) {
             try body()
         }
     }
     
-    public static func outputToConsole(
+    /// Executes the given asynchronous closure and dumps any `PassthroughLogger` logged messages to the console during its execution.
+    public static func dump(
         _ body: () async throws -> Void
     ) async rethrows {
-        try await PassthroughLoggerGlobalConfiguration.$outputToConsole.withValue(true) {
+        try await Self.GlobalConfiguration.$dumpToConsole.withValue(true) {
             try await body()
         }
     }
