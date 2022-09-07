@@ -123,6 +123,23 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
     }
 
     public func error(
+        _ error: String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        log(
+            level: .error,
+            error,
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+
+    public func error(
         _ error: Error,
         metadata: [String: Any]? = nil,
         file: String = #file,

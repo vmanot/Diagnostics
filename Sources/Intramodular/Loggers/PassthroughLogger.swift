@@ -67,9 +67,15 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
         }
     }
     
+    public struct Configuration {
+        public var dumpToConsole: Bool = false
+    }
+    
     private let lock = OSUnfairLock()
     
     public let source: Source
+    
+    private var configuration: Configuration = .init()
     
     public internal(set) var entries: [LogEntry] = []
     
@@ -98,7 +104,7 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
                 )
             )
             
-            if Self.GlobalConfiguration.dumpToConsole {
+            if configuration.dumpToConsole || Self.GlobalConfiguration.dumpToConsole {
                 print("[\(source.description)] \(message())")
             }
         }
@@ -137,6 +143,21 @@ extension PassthroughLogger: TextOutputStream {
     }
 }
 
+// MARK: - Extensions -
+
+extension PassthroughLogger {
+    public var dumpToConsole: Bool {
+        get {
+            lock.withCriticalScope {
+                configuration.dumpToConsole
+            }
+        } set {
+            lock.withCriticalScope {
+                configuration.dumpToConsole = newValue
+            }
+        }
+    }
+}
 // MARK: - Auxiliary Implementation -
 
 extension PassthroughLogger {
