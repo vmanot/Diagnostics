@@ -38,5 +38,9 @@ var package = Package(
 // TODO: Improve conditionalization.
 #if os(Linux)
 package.dependencies.append(.package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"))
-package.targets = package.targets.map({ $0.dependencies.append(.product(name: "Logging", package: "swift-log")) })
+package.targets = package.targets.map { target in
+    var target = target
+    target.dependencies.append(.product(name: "Logging", package: "swift-log"))
+    return target
+}
 #endif

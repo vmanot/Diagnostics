@@ -34,15 +34,18 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     }
     
     public struct Source: CustomStringConvertible {
-        public enum Storage {
+        public enum Content {
+            case sourceCodeLocation(SourceCodeLocation)
             case something(Any)
             case object(Weak<AnyObject>)
         }
         
-        private let storage: Storage
+        private let content: Content
         
         public var description: String {
-            switch storage {
+            switch content {
+                case .sourceCodeLocation(let location):
+                    return location.description
                 case .something(let value):
                     return String(describing: value)
                 case .object(let object):
@@ -54,16 +57,20 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
             }
         }
         
+        public init(location: SourceCodeLocation) {
+            self.content = .sourceCodeLocation(location)
+        }
+        
         public init(_ value: Any) {
             if isClass(type(of: value)) {
-                self.storage = .object(Weak(value as AnyObject))
+                self.content = .object(Weak(value as AnyObject))
             } else {
-                self.storage = .something(value)
+                self.content = .something(value)
             }
         }
         
         public init(_ object: AnyObject) {
-            self.storage = .object(Weak(object))
+            self.content = .object(Weak(object))
         }
     }
     
@@ -81,6 +88,15 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     
     public init(source: Source) {
         self.source = source
+    }
+    
+    public convenience init(
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line,
+        column: UInt? = #column
+    ) {
+        self.init(source: .init(location: SourceCodeLocation(file: file, function: function, line: line, column: column)))
     }
     
     public func log(

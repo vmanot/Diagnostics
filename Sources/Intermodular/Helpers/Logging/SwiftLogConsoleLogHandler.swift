@@ -20,7 +20,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
     
     public init(
         label: String,
-        output: TextOutputStream = ConsoleOutputStream(),
+        output: TextOutputStream = StandardOutputTextStream(),
         level: Logging.Logger.Level = .debug,
         metadata: Logging.Logger.Metadata = [:]
     ) {

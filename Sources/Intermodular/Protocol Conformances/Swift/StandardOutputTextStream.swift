@@ -4,7 +4,8 @@
 
 import Swift
 
-public struct ConsoleOutputStream: TextOutputStream {
+/// A text stream that writes to the standard output.
+public struct StandardOutputTextStream: TextOutputStream {
     public init() {
         
     }

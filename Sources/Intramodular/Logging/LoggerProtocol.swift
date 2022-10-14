@@ -87,7 +87,7 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
             line: line
         )
     }
-
+    
     public func info(
         _ message: @autoclosure () -> String,
         metadata: [String: Any]? = nil,
@@ -104,7 +104,7 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
             line: line
         )
     }
-
+    
     public func warning(
         _ message: @autoclosure () -> String,
         metadata: [String: Any]? = nil,
@@ -121,7 +121,7 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
             line: line
         )
     }
-
+    
     public func error(
         _ error: String,
         metadata: [String: Any]? = nil,
@@ -138,7 +138,7 @@ extension LoggerProtocol where LogLevel: ClientLogLevelProtocol {
             line: line
         )
     }
-
+    
     public func error(
         _ error: Error,
         metadata: [String: Any]? = nil,
