@@ -83,7 +83,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension Logging.Logger.Metadata {
     fileprivate var sortedDescriptionWithoutQuotes: String {

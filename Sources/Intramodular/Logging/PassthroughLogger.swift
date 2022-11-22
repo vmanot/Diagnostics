@@ -174,7 +174,7 @@ extension PassthroughLogger {
         }
     }
 }
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension PassthroughLogger {
     enum GlobalConfiguration {

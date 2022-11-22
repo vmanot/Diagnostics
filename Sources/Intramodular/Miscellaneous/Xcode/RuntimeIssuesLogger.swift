@@ -24,7 +24,7 @@ public struct XcodeRuntimeIssueLogger {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 #if DEBUG
 public let _com_apple_runtime_issues_dso_and_log = (

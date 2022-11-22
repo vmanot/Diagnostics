@@ -56,7 +56,7 @@ public class OSLogHandler: Logging.LogHandler {
     }
 }
 
-// MARK: - Auxiliary Implementation -
+// MARK: - Auxiliary -
 
 extension OSLogType {
     fileprivate init(_ level: Logging.Logger.Level) {
