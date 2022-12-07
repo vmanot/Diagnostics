@@ -6,17 +6,17 @@ import Darwin
 import Swallow
 
 /// An `os_unfair_lock` wrapper.
-public final class OSUnfairLock: Sendable {
+final class OSUnfairLock: Sendable {
     @usableFromInline
     let base: os_unfair_lock_t
     
-    public init() {
+    init() {
         base = .allocate(capacity: 1)
         base.initialize(to: os_unfair_lock())
     }
     
     @inlinable
-    public func acquireOrBlock() {
+    func acquireOrBlock() {
         os_unfair_lock_lock(base)
     }
     
@@ -26,7 +26,7 @@ public final class OSUnfairLock: Sendable {
     }
     
     @inlinable
-    public func acquireOrFail() throws {
+    func acquireOrFail() throws {
         let didAcquire = os_unfair_lock_trylock(base)
         
         if !didAcquire {
@@ -35,7 +35,7 @@ public final class OSUnfairLock: Sendable {
     }
     
     @inlinable
-    public func relinquish() {
+    func relinquish() {
         os_unfair_lock_unlock(base)
     }
     
@@ -47,7 +47,7 @@ public final class OSUnfairLock: Sendable {
 
 extension OSUnfairLock {
     @inlinable
-    public func withCriticalScope<Result>(perform action: () -> Result) -> Result {
+    func withCriticalScope<Result>(perform action: () -> Result) -> Result {
         defer {
             relinquish()
         }
