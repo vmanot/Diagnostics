@@ -23,8 +23,7 @@ public struct XcodeRuntimeIssueLogger {
     
     /// Initializes a custom runtime issue logger with a custom category.
     public init(category: StaticString) {
-        let categoryName = category.withUTF8Buffer { String(decoding: $0, as: UTF8.self) }
-        self.log = OSLog(subsystem: Self.commonSubsystem, category: categoryName)
+        self.log = OSLog(subsystem: Self.commonSubsystem, category: String(_staticString: category))
     }
     
     /// Log a runtime issue to the console.
@@ -41,7 +40,7 @@ public struct XcodeRuntimeIssueLogger {
         guard isEnabled else {
             return
         }
-                
+        
         guard log.isEnabled(type: .fault), callsiteCache.shouldRaiseIssue(in: file, on: line) else {
             return
         }
@@ -49,36 +48,12 @@ public struct XcodeRuntimeIssueLogger {
         guard let handle = XcodeRuntimeIssueLogger.systemFrameworkHandle else {
             return RTI_RUNTIME_ISSUES_UNAVAILABLE()
         }
-
+        
         os_log(.fault, dso: handle, log: log, warningFormat, vaList)
     }
 }
 
-
-
-struct HashedStaticString: Hashable {
-    
-    static func == (lhs: HashedStaticString, rhs: HashedStaticString) -> Bool {
-        lhs.base.withUTF8Buffer { lhs in
-            rhs.base.withUTF8Buffer { rhs in
-                zip(lhs, rhs).first { $0.0 != $0.1 } == nil
-            }
-        }
-    }
-    
-    private var base: StaticString
-    
-    init(_ base: StaticString) {
-        self.base = base
-    }
-    
-    func hash(into hasher: inout Hasher) {
-        base.withUTF8Buffer { buffer in
-            hasher.combine(bytes: UnsafeRawBufferPointer(buffer))
-        }
-    }
-    
-}
+// MARK: - Supplementary API -
 
 @_transparent
 public func runtimeIssue(
@@ -95,13 +70,7 @@ public func runtimeIssue(
     )
 }
 
-private var hasLoggedUnavailable = false
-
-public func RTI_RUNTIME_ISSUES_UNAVAILABLE() {
-    if hasLoggedUnavailable { return }
-    os_log(.fault, "Warn only once: a runtime issue logging expectation was violated. Runtime issues will not be logged. Set a symbolic breakpoint on 'RTI_RUNTIME_ISSUES_UNAVAILABLE' to trace.")
-    hasLoggedUnavailable = true
-}
+// MARK: - Auxiliary -
 
 extension XcodeRuntimeIssueLogger {
     public static let systemFrameworkHandle: UnsafeRawPointer? = {
@@ -113,7 +82,7 @@ extension XcodeRuntimeIssueLogger {
         }
         return nil
     }()
-
+    
     public class CallsiteCache {
         private struct Invocation: Hashable {
             var file: HashedStaticString
@@ -128,6 +97,40 @@ extension XcodeRuntimeIssueLogger {
         public func shouldRaiseIssue(in file: StaticString, on line: UInt) -> Bool {
             print(invocations)
             return invocations.insert(Invocation(file: HashedStaticString(file), line: line)).inserted
+        }
+    }
+}
+
+private var hasLoggedUnavailable = false
+
+public func RTI_RUNTIME_ISSUES_UNAVAILABLE() {
+    if hasLoggedUnavailable {
+        return
+    }
+    
+    os_log(.fault, "Warn only once: a runtime issue logging expectation was violated. Runtime issues will not be logged. Set a symbolic breakpoint on 'RTI_RUNTIME_ISSUES_UNAVAILABLE' to trace.")
+    
+    hasLoggedUnavailable = true
+}
+
+struct HashedStaticString: Hashable {
+    private let base: StaticString
+    
+    init(_ base: StaticString) {
+        self.base = base
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        base.withUTF8Buffer { buffer in
+            hasher.combine(bytes: UnsafeRawBufferPointer(buffer))
+        }
+    }
+    
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.base.withUTF8Buffer { lhs in
+            rhs.base.withUTF8Buffer { rhs in
+                zip(lhs, rhs).first(where: { $0.0 != $0.1 }) == nil
+            }
         }
     }
 }
