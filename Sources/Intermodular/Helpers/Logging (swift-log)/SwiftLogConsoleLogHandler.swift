@@ -3,7 +3,6 @@
 //
 
 #if canImport(Logging)
-
 import Foundation
 import Logging
 import Swift
@@ -13,16 +12,16 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
     private let lock = OSUnfairLock()
     
     public let label: String
-    public var metadata: Logging.Logger.Metadata
-    public var logLevel: Logging.Logger.Level
+    public var metadata: SwiftLogLogger.Metadata
+    public var logLevel: SwiftLogLogger.Level
     
     public private(set) var output: TextOutputStream
     
     public init(
         label: String,
         output: TextOutputStream = StandardOutputTextStream(),
-        level: Logging.Logger.Level = .debug,
-        metadata: Logging.Logger.Metadata = [:]
+        level: SwiftLogLogger.Level = .debug,
+        metadata: SwiftLogLogger.Metadata = [:]
     ) {
         self.label = label
         self.output = output
@@ -30,7 +29,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
         self.logLevel = level
     }
     
-    public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
+    public subscript(metadataKey key: String) -> SwiftLogLogger.Metadata.Value? {
         get {
             return metadata[key]
         } set {
@@ -39,9 +38,9 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
     }
     
     public func log(
-        level: Logging.Logger.Level,
-        message: Logging.Logger.Message,
-        metadata: Logging.Logger.Metadata?,
+        level: SwiftLogLogger.Level,
+        message: SwiftLogLogger.Message,
+        metadata: SwiftLogLogger.Metadata?,
         source: String,
         file: String,
         function: String,
@@ -49,7 +48,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
     ) {
         var text: String = ""
         
-        if logLevel <= .trace {
+        if logLevel <= SwiftLogLogger.Level.trace {
             text += "[\(label)] "
         }
         
@@ -62,7 +61,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
         }
         
         // Log file info if log level is `.debug` or lower.
-        if logLevel <= .debug {
+        if logLevel <= SwiftLogLogger.Level.debug {
             let fileInfo = getConciseSourcePath(fromPath: file) + ":" + line.description
             
             text += " (" + fileInfo + ")"
@@ -85,7 +84,7 @@ public final class SwiftLogConsoleLogHandler: LogHandler {
 
 // MARK: - Auxiliary -
 
-extension Logging.Logger.Metadata {
+extension SwiftLogLogger.Metadata {
     fileprivate var sortedDescriptionWithoutQuotes: String {
         let contents = Array(self)
             .sorted(by: { $0.0 < $1.0 })
@@ -95,5 +94,4 @@ extension Logging.Logger.Metadata {
         return "[\(contents)]"
     }
 }
-
 #endif

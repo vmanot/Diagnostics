@@ -2,17 +2,8 @@
 // Copyright (c) Vatsal Manot
 //
 
-#if canImport(Logging)
-@_exported import Logging
+#if DEBUG
+let _isDebugBuild = true
+#else
+let _isDebugBuild = false
 #endif
-#if canImport(os)
-@_exported import os
-#endif
-
-var _isDebugBuild: Bool {
-    #if DEBUG
-    return true
-    #else
-    return false
-    #endif
-}

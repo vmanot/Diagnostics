@@ -3,14 +3,13 @@
 //
 
 #if canImport(Logging)
-
 import Logging
 import Swallow
 
-extension Logging.Logger {
+extension SwiftLogLogger {
     public func log(
         _ error: Error,
-        metadata: @autoclosure () -> Logging.Logger.Metadata? = nil,
+        metadata: @autoclosure () -> SwiftLogLogger.Metadata? = nil,
         file: String = #file,
         function: String = #function,
         line: UInt = #line
@@ -25,5 +24,4 @@ extension Logging.Logger {
         )
     }
 }
-
 #endif

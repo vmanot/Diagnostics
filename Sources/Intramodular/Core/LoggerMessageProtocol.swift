@@ -15,14 +15,14 @@ import Swallow
 import Swift
 
 /// A type that represents a log message.
-public protocol LogMessageProtocol: ExpressibleByStringLiteral, ExpressibleByStringInterpolation {
+public protocol LogMessageProtocol: ExpressibleByStringLiteral, ExpressibleByStringInterpolation where StringLiteralType == String {
     
 }
 
 // MARK: - Implementations -
 
 #if canImport(Logging)
-extension Logging.Logger.Message: LogMessageProtocol {
+extension SwiftLogLogger.Message: LogMessageProtocol {
     
 }
 #endif

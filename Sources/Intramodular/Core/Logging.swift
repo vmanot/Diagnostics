@@ -2,6 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
+import ObjectiveC
 import Swift
 
 /// A type that logs its activities.

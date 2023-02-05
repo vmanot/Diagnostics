@@ -16,7 +16,8 @@ import Swift
 
 /// A type that represents a log-level.
 public protocol LogLevelProtocol: StringConvertible {
-    
+    static var debug: Self { get }
+    static var error: Self { get }
 }
 
 /// A type that represents a log-level suitable for client-side logging.
@@ -92,7 +93,7 @@ public enum ServerLogLevel: String, ServerLogLevelProtocol {
 }
 
 #if canImport(Logging)
-extension Logging.Logger.Level: LogLevelProtocol {
+extension SwiftLogLogger.Level: LogLevelProtocol {
     public var stringValue: String {
         switch self {
             case .trace:

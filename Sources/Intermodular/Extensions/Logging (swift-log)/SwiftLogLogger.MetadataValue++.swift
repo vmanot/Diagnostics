@@ -3,11 +3,10 @@
 //
 
 #if canImport(Logging)
-
 import Logging
 import Swift
 
-extension Logging.Logger.MetadataValue {
+extension SwiftLogLogger.MetadataValue {
     public init<T>(from value: T) {
         if let value = value as? CustomStringConvertible {
             self = .stringConvertible(value)
@@ -16,5 +15,4 @@ extension Logging.Logger.MetadataValue {
         }
     }
 }
-
 #endif

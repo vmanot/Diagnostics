@@ -3,14 +3,12 @@
 //
 
 #if canImport(Logging)
-
 import Logging
 import Swift
 
-extension Logging.Logger.Message {
+extension SwiftLogLogger.Message {
     public init(_ string: String) {
         self.init(stringLiteral: string)
     }
 }
-
 #endif

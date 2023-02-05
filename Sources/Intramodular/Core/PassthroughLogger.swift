@@ -10,6 +10,115 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     public typealias LogLevel = ClientLogLevel
     public typealias LogMessage = Message
     
+    private let lock = OSUnfairLock()
+    
+    public let source: Source
+    
+    private var configuration: Configuration = .init()
+    
+    public internal(set) var entries: [LogEntry] = []
+    
+    public init(source: Source) {
+        self.source = source
+    }
+    
+    public convenience init(
+        file: StaticString = #file,
+        function: StaticString = #function,
+        line: UInt = #line,
+        column: UInt? = #column
+    ) {
+        self.init(
+            source: .init(
+                location: SourceCodeLocation(
+                    file: file,
+                    function: function,
+                    line: line,
+                    column: column
+                )
+            )
+        )
+    }
+    
+    public func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> LogMessage,
+        metadata: @autoclosure () -> [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        lock.withCriticalScope {
+            entries.append(
+                LogEntry(
+                    sourceCodeLocation: SourceCodeLocation(
+                        file: file,
+                        function: function,
+                        line: line,
+                        column: nil
+                    ),
+                    message: message().description
+                )
+            )
+            
+            if configuration.dumpToConsole || Self.GlobalConfiguration.dumpToConsole {
+                print("[\(source.description)] \(message())")
+            }
+        }
+    }
+    
+    public func log(
+        level: LogLevel,
+        _ message: @autoclosure () -> String,
+        metadata: @autoclosure () -> [String: Any]?,
+        file: String,
+        function: String,
+        line: UInt
+    ) {
+        log(
+            level: level,
+            LogMessage(rawValue: message()),
+            metadata: metadata(),
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+}
+
+// MARK: - Conformances -
+
+extension PassthroughLogger: TextOutputStream {
+    public func write(_ string: String) {
+        entries.append(.init(sourceCodeLocation: nil, message: string))
+        
+        Task {
+            await MainActor.run {
+                self.objectWillChange.send()
+            }
+        }
+    }
+}
+
+// MARK: - Extensions -
+
+extension PassthroughLogger {
+    public var dumpToConsole: Bool {
+        get {
+            lock.withCriticalScope {
+                configuration.dumpToConsole
+            }
+        } set {
+            lock.withCriticalScope {
+                configuration.dumpToConsole = newValue
+            }
+        }
+    }
+}
+
+// MARK: - Auxiliary -
+
+extension PassthroughLogger {
     public struct Message: Equatable, CustomStringConvertible, LogMessageProtocol {
         public typealias StringLiteralType = String
         
@@ -77,104 +186,7 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     public struct Configuration {
         public var dumpToConsole: Bool = false
     }
-    
-    private let lock = OSUnfairLock()
-    
-    public let source: Source
-    
-    private var configuration: Configuration = .init()
-    
-    public internal(set) var entries: [LogEntry] = []
-    
-    public init(source: Source) {
-        self.source = source
-    }
-    
-    public convenience init(
-        file: StaticString = #file,
-        function: StaticString = #function,
-        line: UInt = #line,
-        column: UInt? = #column
-    ) {
-        self.init(source: .init(location: SourceCodeLocation(file: file, function: function, line: line, column: column)))
-    }
-    
-    public func log(
-        level: LogLevel,
-        _ message: @autoclosure () -> LogMessage,
-        metadata: @autoclosure () -> [String: Any]?,
-        file: String,
-        function: String,
-        line: UInt
-    ) {
-        lock.withCriticalScope {
-            entries.append(
-                LogEntry(
-                    sourceCodeLocation: SourceCodeLocation(
-                        file: file,
-                        function: function,
-                        line: line,
-                        column: nil
-                    ),
-                    message: message().description
-                )
-            )
-            
-            if configuration.dumpToConsole || Self.GlobalConfiguration.dumpToConsole {
-                print("[\(source.description)] \(message())")
-            }
-        }
-    }
-    
-    public func log(
-        level: LogLevel,
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> [String: Any]?,
-        file: String,
-        function: String,
-        line: UInt
-    ) {
-        log(
-            level: level,
-            LogMessage(rawValue: message()),
-            metadata: metadata(),
-            file: file,
-            function: function,
-            line: line
-        )
-    }
 }
-
-// MARK: - Protocol Conformances -
-
-extension PassthroughLogger: TextOutputStream {
-    public func write(_ string: String) {
-        entries.append(.init(sourceCodeLocation: nil, message: string))
-        
-        Task {
-            await MainActor.run {
-                self.objectWillChange.send()
-            }
-        }
-    }
-}
-
-// MARK: - Extensions -
-
-extension PassthroughLogger {
-    public var dumpToConsole: Bool {
-        get {
-            lock.withCriticalScope {
-                configuration.dumpToConsole
-            }
-        } set {
-            lock.withCriticalScope {
-                configuration.dumpToConsole = newValue
-            }
-        }
-    }
-}
-// MARK: - Auxiliary -
 
 extension PassthroughLogger {
     enum GlobalConfiguration {

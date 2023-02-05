@@ -3,15 +3,14 @@
 //
 
 #if canImport(Logging)
-
 import Logging
 import os
 import Swift
 
 @available(macOS 11.0, iOS 14.0, watchOS 7.0, tvOS 14.0, *)
-public class OSLogHandler: Logging.LogHandler {
-    public var metadata: [String: Logging.Logger.Metadata.Value] = [:]
-    public var logLevel: Logging.Logger.Level = .debug
+public class OSLogHandler: SwiftLogLogHandler {
+    public var metadata: [String: SwiftLogLogger.Metadata.Value] = [:]
+    public var logLevel: SwiftLogLogger.Level = .debug
     
     private let logger: os.Logger
     
@@ -24,7 +23,7 @@ public class OSLogHandler: Logging.LogHandler {
         self.logger = .init(subsystem: subsystem, category: category)
     }
     
-    public subscript(metadataKey key: String) -> Logging.Logger.Metadata.Value? {
+    public subscript(metadataKey key: String) -> SwiftLogLogger.Metadata.Value? {
         get {
             metadata[key]
         } set {
@@ -33,9 +32,9 @@ public class OSLogHandler: Logging.LogHandler {
     }
     
     public func log(
-        level: Logging.Logger.Level,
-        message: Logging.Logger.Message,
-        metadata: Logging.Logger.Metadata?,
+        level: SwiftLogLogger.Level,
+        message: SwiftLogLogger.Message,
+        metadata: SwiftLogLogger.Metadata?,
         source: String,
         file: String,
         function: String,
@@ -45,9 +44,9 @@ public class OSLogHandler: Logging.LogHandler {
     }
     
     public func log(
-        level: Logging.Logger.Level,
-        message: Logging.Logger.Message,
-        metadata: Logging.Logger.Metadata?,
+        level: SwiftLogLogger.Level,
+        message: SwiftLogLogger.Message,
+        metadata: SwiftLogLogger.Metadata?,
         file: String,
         function: String,
         line: UInt
@@ -59,7 +58,7 @@ public class OSLogHandler: Logging.LogHandler {
 // MARK: - Auxiliary -
 
 extension OSLogType {
-    fileprivate init(_ level: Logging.Logger.Level) {
+    fileprivate init(_ level: SwiftLogLogger.Level) {
         switch level {
             case .trace:
                 self = .debug
@@ -78,5 +77,4 @@ extension OSLogType {
         }
     }
 }
-
 #endif

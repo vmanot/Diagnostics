@@ -3,11 +3,10 @@
 //
 
 #if canImport(Logging)
-
 import Logging
 import Swift
 
-extension Logging.Logger.Level {
+extension SwiftLogLogger.Level {
     public var name: String {
         switch self {
             case .trace:
@@ -27,5 +26,4 @@ extension Logging.Logger.Level {
         }
     }
 }
-
 #endif
