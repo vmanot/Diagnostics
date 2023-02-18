@@ -53,7 +53,7 @@ public struct XcodeRuntimeIssueLogger {
     }
 }
 
-// MARK: - Supplementary API -
+// MARK: - Supplementary API
 
 @_transparent
 public func runtimeIssue(
@@ -70,7 +70,7 @@ public func runtimeIssue(
     )
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension XcodeRuntimeIssueLogger {
     public static let systemFrameworkHandle: UnsafeRawPointer? = {

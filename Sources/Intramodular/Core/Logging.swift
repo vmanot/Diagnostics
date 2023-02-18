@@ -10,7 +10,7 @@ public protocol Logging {
     var logger: PassthroughLogger { get }
 }
 
-// MARK: - Implementation -
+// MARK: - Implementation
 
 private var logger_objcAssociationKey: UInt = 0
 

@@ -55,7 +55,7 @@ public class OSLogHandler: SwiftLogLogHandler {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension OSLogType {
     fileprivate init(_ level: SwiftLogLogger.Level) {

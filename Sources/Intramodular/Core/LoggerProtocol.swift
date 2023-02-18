@@ -19,7 +19,7 @@ public protocol LoggerProtocol: Sendable {
     )
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension LoggerProtocol {
     public func log(

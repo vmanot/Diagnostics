@@ -86,7 +86,7 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     }
 }
 
-// MARK: - Conformances -
+// MARK: - Conformances
 
 extension PassthroughLogger: TextOutputStream {
     public func write(_ string: String) {
@@ -100,7 +100,7 @@ extension PassthroughLogger: TextOutputStream {
     }
 }
 
-// MARK: - Extensions -
+// MARK: - Extensions
 
 extension PassthroughLogger {
     public var dumpToConsole: Bool {
@@ -116,7 +116,7 @@ extension PassthroughLogger {
     }
 }
 
-// MARK: - Auxiliary -
+// MARK: - Auxiliary
 
 extension PassthroughLogger {
     public struct Message: Equatable, CustomStringConvertible, LogMessageProtocol {

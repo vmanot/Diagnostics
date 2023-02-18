@@ -19,7 +19,7 @@ public protocol LogMessageProtocol: ExpressibleByStringLiteral, ExpressibleByStr
     
 }
 
-// MARK: - Implementations -
+// MARK: - Implementations
 
 #if canImport(Logging)
 extension SwiftLogLogger.Message: LogMessageProtocol {
