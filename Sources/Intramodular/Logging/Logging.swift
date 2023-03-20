@@ -3,7 +3,7 @@
 //
 
 import ObjectiveC
-import Swift
+import Swallow
 
 /// A type that logs its activities.
 public protocol Logging {
@@ -16,12 +16,18 @@ private var logger_objcAssociationKey: UInt = 0
 
 extension Logging {
     public var logger: PassthroughLogger {
-        PassthroughLogger(source: PassthroughLogger.Source(self))
+        if isClass(type(of: self)) {
+            let _self = self as! any Logging & AnyObject
+            
+            return _self._defaultLogger
+        } else {
+            return PassthroughLogger(source: .something(self))
+        }
     }
 }
 
 extension Logging where Self: AnyObject {
-    public var logger: PassthroughLogger {
+    fileprivate var _defaultLogger: PassthroughLogger {
         if let result = objc_getAssociatedObject(self, &logger_objcAssociationKey) as? PassthroughLogger {
             return result
         } else {
@@ -31,7 +37,7 @@ extension Logging where Self: AnyObject {
                 objc_sync_exit(self)
             }
             
-            let result = PassthroughLogger(source: PassthroughLogger.Source(self))
+            let result = PassthroughLogger(source: .object(self))
             
             objc_setAssociatedObject(self, &logger_objcAssociationKey, result, .OBJC_ASSOCIATION_RETAIN)
             

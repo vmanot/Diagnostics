@@ -3,6 +3,7 @@
 //
 
 import Combine
+import Foundation
 import Swallow
 
 /// A logger that broadcasts its entries.
@@ -10,16 +11,14 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     public typealias LogLevel = ClientLogLevel
     public typealias LogMessage = Message
     
-    private let lock = OSUnfairLock()
+    private let base: _PassthroughLogger
     
-    public let source: Source
+    private init(base: _PassthroughLogger) {
+        self.base = base
+    }
     
-    private var configuration: Configuration = .init()
-    
-    public internal(set) var entries: [LogEntry] = []
-    
-    public init(source: Source) {
-        self.source = source
+    public convenience init(source: Source) {
+        self.init(base: .init(source: source))
     }
     
     public convenience init(
@@ -29,8 +28,8 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
         column: UInt? = #column
     ) {
         self.init(
-            source: .init(
-                location: SourceCodeLocation(
+            source: .location(
+                SourceCodeLocation(
                     file: file,
                     function: function,
                     line: line,
@@ -48,36 +47,17 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
         function: String,
         line: UInt
     ) {
-        lock.withCriticalScope {
-            entries.append(
-                LogEntry(
-                    sourceCodeLocation: SourceCodeLocation(
-                        file: file,
-                        function: function,
-                        line: line,
-                        column: nil
-                    ),
-                    message: message().description
-                )
-            )
-            
-            if configuration.dumpToConsole || Self.GlobalConfiguration.dumpToConsole {
-                print("[\(source.description)] \(message())")
+        if Thread.isMainThread {
+            objectWillChange.send()
+        } else {
+            DispatchQueue.main.async { [weak self] in
+                self?.objectWillChange.send()
             }
         }
-    }
-    
-    public func log(
-        level: LogLevel,
-        _ message: @autoclosure () -> String,
-        metadata: @autoclosure () -> [String: Any]?,
-        file: String,
-        function: String,
-        line: UInt
-    ) {
-        log(
+        
+        base.log(
             level: level,
-            LogMessage(rawValue: message()),
+            message(),
             metadata: metadata(),
             file: file,
             function: function,
@@ -86,17 +66,23 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
     }
 }
 
+extension PassthroughLogger: _LogExporting {
+    public func exportLog() async throws -> some _LogFormat {
+        try await base.exportLog()
+    }
+}
+
 // MARK: - Conformances
+
+extension PassthroughLogger: ScopedLogger {
+    public func scoped(to scope: AnyLogScope) throws -> PassthroughLogger {
+        PassthroughLogger(base: try base.scoped(to: scope))
+    }
+}
 
 extension PassthroughLogger: TextOutputStream {
     public func write(_ string: String) {
-        entries.append(.init(sourceCodeLocation: nil, message: string))
-        
-        Task {
-            await MainActor.run {
-                self.objectWillChange.send()
-            }
-        }
+        base.write(string)
     }
 }
 
@@ -105,13 +91,9 @@ extension PassthroughLogger: TextOutputStream {
 extension PassthroughLogger {
     public var dumpToConsole: Bool {
         get {
-            lock.withCriticalScope {
-                configuration.dumpToConsole
-            }
+            base.configuration.dumpToConsole
         } set {
-            lock.withCriticalScope {
-                configuration.dumpToConsole = newValue
-            }
+            base.configuration.dumpToConsole = newValue
         }
     }
 }
@@ -139,12 +121,16 @@ extension PassthroughLogger {
     
     public struct LogEntry: Hashable {
         public let sourceCodeLocation: SourceCodeLocation?
+        public let timestamp: Date
+        public let scope: PassthroughLoggerScope
+        public let level: LogLevel
         public let message: String
     }
     
     public struct Source: CustomStringConvertible {
         public enum Content {
             case sourceCodeLocation(SourceCodeLocation)
+            case logger(any LoggerProtocol)
             case something(Any)
             case object(Weak<AnyObject>)
         }
@@ -155,6 +141,8 @@ extension PassthroughLogger {
             switch content {
                 case .sourceCodeLocation(let location):
                     return location.description
+                case .logger(let logger):
+                    return String(describing: logger)
                 case .something(let value):
                     return String(describing: value)
                 case .object(let object):
@@ -166,20 +154,28 @@ extension PassthroughLogger {
             }
         }
         
-        public init(location: SourceCodeLocation) {
-            self.content = .sourceCodeLocation(location)
+        private init(content: Content) {
+            self.content = content
         }
         
-        public init(_ value: Any) {
-            if isClass(type(of: value)) {
-                self.content = .object(Weak(value as AnyObject))
+        public static func location(_ location: SourceCodeLocation) -> Self {
+            Self(content: .sourceCodeLocation(location))
+        }
+        
+        public static func logger(_ logger: any LoggerProtocol) -> Self {
+            Self(content: .logger(logger))
+        }
+        
+        public static func object(_ object: AnyObject) -> Self {
+            Self(content: .object(Weak(object)))
+        }
+        
+        public static func something(_ thing: Any) -> Self {
+            if isClass(type(of: thing)) {
+                return .object(thing as AnyObject)
             } else {
-                self.content = .something(value)
+                return .init(content: .something(thing))
             }
-        }
-        
-        public init(_ object: AnyObject) {
-            self.content = .object(Weak(object))
         }
     }
     

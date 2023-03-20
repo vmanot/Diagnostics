@@ -62,7 +62,7 @@ public enum AnyLogLevel: String, LogLevelProtocol {
 }
 
 /// A log-level type suitable for client applications.
-public enum ClientLogLevel: String, ClientLogLevelProtocol {
+public enum ClientLogLevel: String, ClientLogLevelProtocol, CustomStringConvertible {
     case undefined
     case debug
     case info
@@ -74,6 +74,10 @@ public enum ClientLogLevel: String, ClientLogLevelProtocol {
     
     public var stringValue: String {
         rawValue
+    }
+    
+    public var description: String {
+        stringValue
     }
 }
 
