@@ -101,7 +101,7 @@ extension PassthroughLogger {
 // MARK: - Auxiliary
 
 extension PassthroughLogger {
-    public struct Message: Equatable, CustomStringConvertible, LogMessageProtocol {
+    public struct Message: Codable, CustomStringConvertible, Hashable, LogMessageProtocol {
         public typealias StringLiteralType = String
         
         private var rawValue: String
@@ -117,6 +117,14 @@ extension PassthroughLogger {
         public init(stringLiteral value: String) {
             self.rawValue = value
         }
+        
+        public init(from decoder: Decoder) throws {
+            try self.init(rawValue: .init(from: decoder))
+        }
+        
+        public func encode(to encoder: Encoder) throws {
+            try rawValue.encode(to: encoder)
+        }
     }
     
     public struct LogEntry: Hashable {
@@ -124,7 +132,7 @@ extension PassthroughLogger {
         public let timestamp: Date
         public let scope: PassthroughLoggerScope
         public let level: LogLevel
-        public let message: String
+        public let message: LogMessage
     }
     
     public struct Source: CustomStringConvertible {

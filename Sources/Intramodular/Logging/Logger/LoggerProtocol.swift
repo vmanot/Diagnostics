@@ -58,6 +58,23 @@ extension LoggerProtocol {
     }
     
     public func error(
+        _ error:  @autoclosure () -> String,
+        metadata: [String: Any]? = nil,
+        file: String = #file,
+        function: String = #function,
+        line: UInt = #line
+    ) {
+        self.log(
+            level: .error,
+            error(),
+            metadata: metadata,
+            file: file,
+            function: function,
+            line: line
+        )
+    }
+
+    public func error(
         _ error:  @autoclosure () -> Error,
         metadata: [String: Any]? = nil,
         file: String = #file,

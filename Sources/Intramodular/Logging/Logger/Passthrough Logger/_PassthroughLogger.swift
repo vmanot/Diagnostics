@@ -56,13 +56,15 @@ final class _PassthroughLogger: LoggerProtocol, @unchecked Sendable {
             timestamp: Date(),
             scope: scope,
             level: level,
-            message: message().description
+            message: message()
         )
         
         parent?.entries.append(entry)
         
-        if configuration.dumpToConsole || PassthroughLogger.GlobalConfiguration.dumpToConsole {
-            print("[\(source.description)] \(message())")
+        if _isDebugBuild {
+            if configuration.dumpToConsole || PassthroughLogger.GlobalConfiguration.dumpToConsole {
+                print("[\(source.description)] \(message())")
+            }
         }
 
         lock.withCriticalScope {
@@ -80,7 +82,7 @@ extension _PassthroughLogger: _LogExporting {
                 timestamp: $0.timestamp,
                 scope: scope._toTextualLogDumpScope(),
                 level: $0.level.description,
-                message: $0.message
+                message: $0.message.description
             )
         })
     }
@@ -97,7 +99,15 @@ extension _PassthroughLogger: ScopedLogger {
 
 extension _PassthroughLogger: TextOutputStream {
     public func write(_ string: String) {
-        entries.append(.init(sourceCodeLocation: nil, timestamp: Date(), scope: .root, level: .info, message: string))
+        entries.append(
+            .init(
+                sourceCodeLocation: nil,
+                timestamp: Date(),
+                scope: .root,
+                level: .info,
+                message: .init(stringLiteral: string)
+            )
+        )
     }
 }
 
