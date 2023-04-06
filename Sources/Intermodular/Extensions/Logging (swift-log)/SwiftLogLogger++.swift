@@ -4,7 +4,7 @@
 
 #if canImport(Logging)
 import Logging
-import Swallow
+import Swift
 
 extension SwiftLogLogger {
     public func log(

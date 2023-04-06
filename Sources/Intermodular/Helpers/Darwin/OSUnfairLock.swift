@@ -11,8 +11,11 @@ final class OSUnfairLock: Sendable {
     let base: os_unfair_lock_t
     
     init() {
-        base = .allocate(capacity: 1)
-        base.initialize(to: os_unfair_lock())
+        let base = os_unfair_lock_t.allocate(capacity: 1)
+        
+        base.initialize(repeating: os_unfair_lock_s(), count: 1)
+        
+        self.base = base
     }
     
     @inlinable
