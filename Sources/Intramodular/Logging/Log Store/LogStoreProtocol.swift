@@ -21,7 +21,7 @@ public protocol LogStoreProtocol {
     ) throws -> LogEntries
 }
 
-// MARK: - Implementations
+// MARK: - Conforming Implementations
 
 #if canImport(OSLog)
 import OSLog
