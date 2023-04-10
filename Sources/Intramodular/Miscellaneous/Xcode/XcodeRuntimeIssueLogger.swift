@@ -53,6 +53,13 @@ public struct XcodeRuntimeIssueLogger {
     }
 }
 
+extension XcodeRuntimeIssueLogger {
+    @_transparent
+    public func error(_ error: Error) {
+        runtimeIssue("%{public}@", error.localizedDescription)
+    }
+}
+
 // MARK: - Supplementary API
 
 @_transparent
