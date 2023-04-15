@@ -43,7 +43,7 @@ public protocol ServerLogLevelProtocol: LogLevelProtocol {
     static var critical: Self { get }
 }
 
-// MARK: - Conforming Implementations
+// MARK: - Implemented Conformances
 
 public enum AnyLogLevel: String, LogLevelProtocol {
     case undefined
