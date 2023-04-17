@@ -101,8 +101,10 @@ extension XcodeRuntimeIssueLogger {
         /// Returns whether to raise a runtime issue in a file on a particular line.
         ///
         /// A notification of a runtime issue will only arise once, so only the first call will return true.
-        public func shouldRaiseIssue(in file: StaticString, on line: UInt) -> Bool {
-            print(invocations)
+        public func shouldRaiseIssue(
+            in file: StaticString,
+            on line: UInt
+        ) -> Bool {
             return invocations.insert(Invocation(file: HashedStaticString(file), line: line)).inserted
         }
     }
