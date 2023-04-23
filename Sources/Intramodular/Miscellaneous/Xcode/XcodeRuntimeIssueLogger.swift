@@ -77,6 +77,20 @@ public func runtimeIssue(
     )
 }
 
+@_transparent
+public func runtimeIssue(
+    _ message: @autoclosure () -> String,
+    file: StaticString = #file,
+    line: UInt = #line
+) {
+    XcodeRuntimeIssueLogger.default.raise(
+        "%@",
+        file: file,
+        line: line,
+        vaList: message() 
+    )
+}
+
 // MARK: - Auxiliary
 
 extension XcodeRuntimeIssueLogger {
