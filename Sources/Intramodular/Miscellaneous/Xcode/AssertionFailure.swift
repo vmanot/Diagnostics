@@ -2,9 +2,7 @@
 // Copyright (c) Vatsal Manot
 //
 
-import Combine
-import Swift
-import os
+import Swallow
 
 /// A Swift `Error` that represents an assertion failure.
 public struct _AssertionFailure: Error {
