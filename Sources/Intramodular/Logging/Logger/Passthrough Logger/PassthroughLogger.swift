@@ -55,6 +55,12 @@ public final class PassthroughLogger: @unchecked Sendable, LoggerProtocol, Obser
             }
         }
         
+        if _isDebugAssertConfiguration {
+            if level == .error {
+                runtimeIssue(message().description)
+            }
+        }
+        
         base.log(
             level: level,
             message(),

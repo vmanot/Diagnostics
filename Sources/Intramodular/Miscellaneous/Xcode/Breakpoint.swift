@@ -3,24 +3,27 @@
 //
 
 import Combine
-import Swift
+import Swallow
 import os
 
 public struct Breakpoint {
     @_transparent
     public static func trigger() {
-        #if DEUB
-        raise(SIGTRAP)
-        #endif
+        if _isDebugAssertConfiguration {
+            raise(SIGTRAP)
+        }
     }
 
-    static func _altTrigger() {
+    @_spi(Internal)
+    @_transparent
+    public static func _altTrigger() {
         _ = Fail<Void, _GenericBreakpointError>(error: _GenericBreakpointError.some)
             .breakpointOnError()
             .sink(receiveCompletion: { _ in }, receiveValue: { _ in })
     }
     
-    enum _GenericBreakpointError: Error {
+    @_spi(Internal)
+    public enum _GenericBreakpointError: Error {
         case some
     }
 }
