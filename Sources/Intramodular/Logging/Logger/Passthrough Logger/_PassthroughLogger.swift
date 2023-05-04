@@ -4,7 +4,7 @@
 
 import Combine
 import Foundation
-import Swallow
+@_spi(Internal) import Swallow
 
 /// A logger that broadcasts its entries.
 final class _PassthroughLogger: LoggerProtocol, @unchecked Sendable {
