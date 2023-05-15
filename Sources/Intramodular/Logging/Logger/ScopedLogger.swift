@@ -23,7 +23,13 @@ public protocol LogScope: CustomStringConvertible, Hashable {
 }
 
 public struct AnyLogScope: _UnwrappableTypeEraser, LogScope {
-    private let base: any LogScope
+    public typealias _UnwrappedBaseType = any LogScope
+    
+    private let base: _UnwrappedBaseType
+    
+    public init(_erasing base: _UnwrappedBaseType) {
+        self.base = base
+    }
     
     public var description: String {
         base.description
